@@ -14,9 +14,17 @@ export class PlayGame extends Phaser.Scene {
 
     create() {
 
-        var lvl1Grid = [[1, 1, 1],
-        [1, 1, 1, 1, 1],
-        [1, 1, 1]];
+        this.playerLives = 3;
+        this.playerScore = 0;
+
+        var lvl1Grid = [[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+        [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
+        [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
+        [3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3],
+        [3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3],
+        [4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4],
+        [4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4]];
 
         //music
         var music        = this.sound.add('mainloop');
@@ -48,28 +56,52 @@ export class PlayGame extends Phaser.Scene {
 
         this.events.on('wake', () => { music.resume(); })
 
-        
+
         //brick init
         var brickGroup = this.physics.add.staticGroup();
-        var xs = 100;
-        var ys = 100;
+        var xs         = 32;
+        var ys         = 100;
 
         for (var i = 0; i < lvl1Grid.length; i++) {
             ys += constants.brickSpacingY;
-            xs = 100;
+            xs  = 32;
             for (var j = 0; j < lvl1Grid[i].length; j++) {
                 if (lvl1Grid[i][j] == 1) {
+                    brickGroup.create(xs, ys, 'brick').setDataEnabled().data.set('type', 4);
                     xs += constants.brickSpacingX;
-                    brickGroup.create(xs, ys, 'brick');
-                    
+                }
+                else if (lvl1Grid[i][j] == 2) {
+                    brickGroup.create(xs, ys, 'brick').setDataEnabled().data.set('type', 3)
+                    xs += constants.brickSpacingX;
+                }
+                else if (lvl1Grid[i][j] == 3) {
+                    brickGroup.create(xs, ys, 'brick').setDataEnabled().data.set('type', 2);
+                    xs += constants.brickSpacingX;
+                }
+                else if (lvl1Grid[i][j] == 4) {
+                    brickGroup.create(xs, ys, 'brick').setDataEnabled().data.set('type', 1);
+                    xs += constants.brickSpacingX;
                 }
             }
         }
         this.physics.add.collider(brickGroup, ball, (ball, brick) => {
-            brick.destroy();
-            if (brickGroup.children.entries.length == 0) {
-                alert('GAME OVER');
+            if (brick.getData('type') == 1) {
+                this.playerScore += 1;
             }
+            else if (brick.getData('type') == 2) {
+                this.playerScore += 3;
+            }
+            else if (brick.getData('type') == 3) {
+                this.playerScore += 5;
+            }
+            else if (brick.getData('type') == 4) {
+                this.playerScore += 7;
+            }
+                brick.destroy();
+            if (brickGroup.children.entries.length == 0) {
+                alert('You Win!');
+            }
+            console.log(this.playerScore);
         });
 
         //Set colliders
@@ -104,10 +136,18 @@ export class PlayGame extends Phaser.Scene {
         else if (this.ball.body.x <= 0) {
             this.ballHitSound.play();
         }
+
+        //bottom check for loss
+        if (this.ball.body.y + this.ball.body.height >= game.canvas.height) {
+            this.playerLives--;
+            this.checkGameOver();//check for game over
+        }
+
+        
     }
 
     checkGameOver() {
-        if (this.paddle1Score == constants.winScore) {
+        if (this.playerLives == 0) {
             this.scene.switch('GameOver');
         }
     }

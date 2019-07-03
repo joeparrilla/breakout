@@ -6,15 +6,15 @@ import {GameOver} from './scenes/GameOver.js';
 ///////////////////////////////////////////////////////////////// instantiation
 var config = {
     type   : Phaser.AUTO,
-    width  : 800,
-    height : 800,
+    width  : 768,
+    height : 600,
     physics: {
         default: 'arcade',
         arcade : {
             debug: false
         }
     },
-    scene: PlayGame//[MainMenu, PlayGame, OptionsMenu, GameOver]
+    scene: [PlayGame, GameOver]//[MainMenu, PlayGame, OptionsMenu, GameOver]
 };
  
 self.game = new Phaser.Game(config);
