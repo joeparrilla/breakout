@@ -14,8 +14,18 @@ export class PlayGame extends Phaser.Scene {
 
     create() {
 
-        this.playerLives = 3;
-        this.playerScore = 0;
+        this.playerLives  = 3;
+        this.playerScore  = 0;
+        this.ballLaunched = false;
+
+        //music
+        var music        = this.sound.add('mainloop');
+        var ballHitSound = this.sound.add('ballhit');
+
+        this.ballHitSound = ballHitSound;
+
+        this.scoreText = this.add.text(0, 0, `score: ${this.playerScore}`, { fontFamily: '"Roboto Condensed"' });
+        this.livesText = this.add.text(720, 0, `lives: ${this.playerLives}`, { fontFamily: '"Roboto Condensed"' });
 
         var lvl1Grid = [[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
         [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
@@ -26,18 +36,14 @@ export class PlayGame extends Phaser.Scene {
         [4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4],
         [4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4]];
 
-        //music
-        var music        = this.sound.add('mainloop');
-        var ballHitSound = this.sound.add('ballhit');
-
-        this.ballHitSound = ballHitSound;
+        
 
 
         music.play({ loop: true, volume: .25 });
 
         let cursors = this.input.keyboard.createCursorKeys(),
             paddle1 = this.physics.add.sprite(game.canvas.width / 2, game.canvas.height, 'paddle1'),
-            ball    = this.physics.add.sprite(game.canvas.width / 2, game.canvas.height / 2, 'ball').setBounce(1),
+            ball    = this.physics.add.sprite(paddle1.body.x, paddle1.body.y - 24, 'ball').setBounce(1),
             objects = [paddle1, ball];
 
         for (let key in objects) {
@@ -52,6 +58,10 @@ export class PlayGame extends Phaser.Scene {
         this.input.keyboard.on('keydown-ESC', () => {
             this.scene.switch('MainMenu');
             music.pause();
+        });
+
+        this.input.keyboard.on('keydown-SPACE', () => {
+            this.ballLaunched = true;
         });
 
         this.events.on('wake', () => { music.resume(); })
@@ -101,7 +111,7 @@ export class PlayGame extends Phaser.Scene {
             if (brickGroup.children.entries.length == 0) {
                 alert('You Win!');
             }
-            console.log(this.playerScore);
+            this.scoreText.text = `score: ${this.playerScore}`;
         });
 
         //Set colliders
@@ -116,7 +126,7 @@ export class PlayGame extends Phaser.Scene {
         this.ballVX = 0;
         this.ballVY = 400;
 
-        this.ball.setVelocity(this.ballVX, this.ballVY);
+        //this.ball.setVelocity(this.ballVX, this.ballVY);
 
     }
 
@@ -127,6 +137,11 @@ export class PlayGame extends Phaser.Scene {
             paddle1Velocity = (right - left) * paddle1Speed;
 
         this.paddle1.setVelocityX(paddle1Velocity);
+
+        if (!this.ballLaunched) {
+            this.ball.setX(this.paddle1.body.x + this.paddle1.body.width / 2);
+            this.ball.setY(this.paddle1.body.y);
+        }
 
 
         //left/right check for sound
@@ -140,6 +155,8 @@ export class PlayGame extends Phaser.Scene {
         //bottom check for loss
         if (this.ball.body.y + this.ball.body.height >= game.canvas.height) {
             this.playerLives--;
+            this.ballLaunched = false;
+            this.livesText.text = `lives: ${this.playerLives}`;
             this.checkGameOver();//check for game over
         }
 
