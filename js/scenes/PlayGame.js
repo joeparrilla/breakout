@@ -5,8 +5,12 @@ export class PlayGame extends Phaser.Scene {
 
     preload() {
         this.load.image('paddle1', 'assets/sprites/paddle.png');
+        this.load.image('paddle1Reduced', 'assets/sprites/paddleReduced.png');
         this.load.image('ball', 'assets/sprites/ball.png');
-        this.load.image('brick', 'assets/sprites/brick.png');
+        this.load.image('brickyellow', 'assets/sprites/brickyellow.png');
+        this.load.image('brickgreen', 'assets/sprites/brickgreen.png');
+        this.load.image('brickorange', 'assets/sprites/brickorange.png');
+        this.load.image('brickred', 'assets/sprites/brickred.png');
 
         this.load.audio('mainloop', 'assets/audio/mainmusicloop.wav');
         this.load.audio('ballhit', 'assets/audio/ballhit.wav');
@@ -17,6 +21,7 @@ export class PlayGame extends Phaser.Scene {
         this.playerLives  = 3;
         this.playerScore  = 0;
         this.ballLaunched = false;
+        this.paddleSizeReduced = false;
 
         //music
         var music        = this.sound.add('mainloop');
@@ -36,10 +41,8 @@ export class PlayGame extends Phaser.Scene {
         [4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4],
         [4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4]];
 
-        
 
-
-        music.play({ loop: true, volume: .25 });
+        music.play({ loop: true, volume: 0 });
 
         let cursors = this.input.keyboard.createCursorKeys(),
             paddle1 = this.physics.add.sprite(game.canvas.width / 2, game.canvas.height, 'paddle1'),
@@ -64,6 +67,10 @@ export class PlayGame extends Phaser.Scene {
             this.ballLaunched = true;
         });
 
+        this.paddle1.on('destroy', (paddle1) => {
+            this.paddle1
+        })
+
         this.events.on('wake', () => { music.resume(); })
 
 
@@ -77,19 +84,19 @@ export class PlayGame extends Phaser.Scene {
             xs  = 32;
             for (var j = 0; j < lvl1Grid[i].length; j++) {
                 if (lvl1Grid[i][j] == 1) {
-                    brickGroup.create(xs, ys, 'brick').setDataEnabled().data.set('type', 4);
+                    brickGroup.create(xs, ys, 'brickred').setDataEnabled().data.set('type', 4);
                     xs += constants.brickSpacingX;
                 }
                 else if (lvl1Grid[i][j] == 2) {
-                    brickGroup.create(xs, ys, 'brick').setDataEnabled().data.set('type', 3)
+                    brickGroup.create(xs, ys, 'brickorange').setDataEnabled().data.set('type', 3)
                     xs += constants.brickSpacingX;
                 }
                 else if (lvl1Grid[i][j] == 3) {
-                    brickGroup.create(xs, ys, 'brick').setDataEnabled().data.set('type', 2);
+                    brickGroup.create(xs, ys, 'brickgreen').setDataEnabled().data.set('type', 2);
                     xs += constants.brickSpacingX;
                 }
                 else if (lvl1Grid[i][j] == 4) {
-                    brickGroup.create(xs, ys, 'brick').setDataEnabled().data.set('type', 1);
+                    brickGroup.create(xs, ys, 'brickyellow').setDataEnabled().data.set('type', 1);
                     xs += constants.brickSpacingX;
                 }
             }
@@ -158,6 +165,19 @@ export class PlayGame extends Phaser.Scene {
             this.ballLaunched = false;
             this.livesText.text = `lives: ${this.playerLives}`;
             this.checkGameOver();//check for game over
+        }
+
+        //upper wall check for paddle decrease
+        if (this.ball.body.y <= 0 && !this.paddleSizeReduced) {
+            let paddleX = this.paddle1.body.x;
+            let paddleY = this.paddle1.body.Y;
+            this.paddleSizeReduced = true;
+            this.paddle1.setTexture('paddle1Reduced');
+            this.paddle1.setDisplaySize(75, 16);
+            this.paddle1.setSize(75, 16);
+            //this.paddle1.destroy();
+            //this.paddle1 = this.physics.add.sprite(game.canvas.width / 2, game.canvas.height, 'paddle1Reduced');
+            //this.paddle1.setCollideWorldBounds(true);
         }
 
         
