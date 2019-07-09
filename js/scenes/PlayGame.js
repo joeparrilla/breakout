@@ -65,6 +65,7 @@ export class PlayGame extends Phaser.Scene {
 
         this.input.keyboard.on('keydown-SPACE', () => {
             this.ballLaunched = true;
+            this.ball.body.velocity.y = 400;
         });
 
         this.paddle1.on('destroy', (paddle1) => {
@@ -124,7 +125,22 @@ export class PlayGame extends Phaser.Scene {
         //Set colliders
         this.physics.add.collider(ball, paddle1, (ball, paddle1) => {
             ballHitSound.play();
-            ball.setVelocityX(paddle1.body.velocity.x > 0 ? ball.body.velocity.x + 100 : ball.body.velocity.x - 100);
+            //check where ball hit
+            if (ball.body.x > paddle1.body.x + paddle1.body.width / 1.5) {
+                ball.body.velocity.x = 400;
+            }
+            else if (ball.body.x > paddle1.body.x + paddle1.body.width / 2) {
+                ball.body.velocity.x = 200;
+            } 
+            else if (ball.body.x < paddle1.body.x + paddle1.body.width / 2.5) {
+                ball.body.velocity.x = -400;
+            }
+            else if (ball.body.x < paddle1.body.x + paddle1.body.width / 2) {
+                ball.body.velocity.x = -200;
+            }
+            else {
+                ball.body.velocity.x = 0;
+            }
             ball.setVelocityY(-this.ballVY);
         }, null, this);
 
@@ -163,14 +179,13 @@ export class PlayGame extends Phaser.Scene {
         if (this.ball.body.y + this.ball.body.height >= game.canvas.height) {
             this.playerLives--;
             this.ballLaunched = false;
+            this.ball.body.velocity.x = 0;
             this.livesText.text = `lives: ${this.playerLives}`;
             this.checkGameOver();//check for game over
         }
 
         //upper wall check for paddle decrease
         if (this.ball.body.y <= 0 && !this.paddleSizeReduced) {
-            let paddleX = this.paddle1.body.x;
-            let paddleY = this.paddle1.body.Y;
             this.paddleSizeReduced = true;
             this.paddle1.setTexture('paddle1Reduced');
             this.paddle1.setDisplaySize(75, 16);
