@@ -13,8 +13,8 @@ export class MainMenu extends Phaser.Scene {
  
     createEntries() {
         let style  = { fontFamily: 'Arial', fontSize: 50, color: '#00ff00' },
-            coords = [ {x:150, y: 180}, {x:150, y: 280}, {x:150, y: 380}, ],
-            text   = [ 'Start Game', 'Options', 'Exit Game' ];
+            coords = [ {x:150, y: 180}, {x:150, y: 280} ],
+            text   = [ 'Start Game', 'Exit Game' ];
  
         for (let key in text) {
             let x          = coords[key].x,

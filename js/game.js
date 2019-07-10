@@ -1,7 +1,7 @@
 import {MainMenu} from './scenes/MainMenu.js';
-import {OptionsMenu} from './scenes/OptionsMenu.js';
 import {PlayGame} from './scenes/PlayGame.js';
 import {GameOver} from './scenes/GameOver.js';
+import {Pause} from './scenes/Pause.js';
  
 ///////////////////////////////////////////////////////////////// instantiation
 var config = {
@@ -14,7 +14,7 @@ var config = {
             debug: false
         }
     },
-    scene: [PlayGame, GameOver]//[MainMenu, PlayGame, OptionsMenu, GameOver]
+    scene: [MainMenu, PlayGame, GameOver, Pause]
 };
  
 self.game = new Phaser.Game(config);

@@ -59,7 +59,8 @@ export class PlayGame extends Phaser.Scene {
 
 
         this.input.keyboard.on('keydown-ESC', () => {
-            this.scene.switch('MainMenu');
+            this.scene.pause();
+            this.scene.launch('Pause');
             music.pause();
         });
 
